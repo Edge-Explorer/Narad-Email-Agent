@@ -31,14 +31,24 @@ class EmailAgent(BaseAgent):
 
     def _make_links_clickable(self, text: str) -> str:
         """Helper to convert plain text URLs into HTML clickable links."""
-        url_pattern = r'(https?://[^\s<>"]+|www\.[^\s<>"]+|[a-zA-Z0-9.-]+\.(com|in|org|net|io|me|edu)[^\s<>"]*)'
+        # More robust URL regex pattern
+        url_pattern = r'((?:https?://|www\.|[a-zA-Z0-9][-a-zA-Z0-9]*\.)[a-zA-Z0-9][-a-zA-Z0-9.]*\.(?:com|in|org|net|io|me|edu|app|dev|sh|ai|gov|mil|edu|[a-z]{2})(?:/[^\s<>"]*)?)'
+        
         def replace_match(match):
             url = match.group(0)
-            href = url if url.startswith('http') else 'https://' + url
-            return f'<a href="{href}" style="color: #1a73e8; text-decoration: none;">{url}</a>'
+            # Clean up trailing punctuation that might have been caught
+            clean_url = url.rstrip('.,!?;:)')
+            trailing_punct = url[len(clean_url):]
+            
+            href = clean_url
+            if not clean_url.startswith('http'):
+                href = 'https://' + clean_url
+            
+            return f'<a href="{href}" style="color: #1a73e8; text-decoration: underline;">{clean_url}</a>{trailing_punct}'
         
-        # Convert newlines to <br> and replace URLs
+        # Convert newlines to <br>
         html = text.replace('\n', '<br>')
+        # Replace URLs
         html = re.sub(url_pattern, replace_match, html)
         return html
 
