@@ -34,6 +34,7 @@ Copy `.env.example` to `.env` and fill in your details:
 - **`EMAIL_ADDRESS`**: Your Gmail address.
 - **`EMAIL_PASSWORD`**: Your [Gmail App Password](https://myaccount.google.com/security) (16 digits).
 - **`GEMINI_API_KEY`**: Your key from [Google AI Studio](https://aistudio.google.com/app/apikey).
+- **`USER_NAME`, `USER_UNIVERSITY`, etc.**: Add these to `.env` to make your AI drafts personalized!
 
 ---
 

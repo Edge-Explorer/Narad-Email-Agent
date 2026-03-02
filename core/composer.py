@@ -4,6 +4,11 @@ class EmailComposer:
     """Uses Gemini to draft professional emails."""
     def __init__(self):
         self.gemini = GeminiClient()
+        # Load user profile from environment variables.
+        self.user_name = os.getenv("USER_NAME", "[Your Name]")
+        self.user_university = os.getenv("USER_UNIVERSITY", "[Your University]")
+        self.user_year = os.getenv("USER_YEAR", "[Your Year]")
+        self.user_major = os.getenv("USER_MAJOR", "[Your Major]")
 
     def draft_email(self, description: str, tone: str = "formal") -> dict:
         """
@@ -11,11 +16,18 @@ class EmailComposer:
         :param description: What the email is about.
         :param tone: "formal" or "informal".
         """
+        # Create a user context string.
+        user_context = f"My name is {self.user_name}. I am a {self.user_year} student at {self.user_university} majoring in {self.user_major}."
+        
         prompt = f"""
+        {user_context}
+        
         Draft a {tone} email based on this description: '{description}'
         
         If formal: use professional language, proper greetings, and clear structure.
         If informal: use casual, friendly language and a relaxed tone.
+        
+        Auto-fill as much information as possible using my details. If you don't have enough details, use appropriate placeholders.
 
         Provide the output in this EXACT format:
         SUBJECT: [Your Subject Line]
