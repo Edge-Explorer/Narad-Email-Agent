@@ -29,27 +29,26 @@ class EmailAgent(BaseAgent):
         self.smtp_port = int(os.getenv("SMTP_PORT", 587))
         self.imap_server = os.getenv("IMAP_SERVER", "imap.gmail.com")
 
-    def _make_links_clickable(self, text: str) -> str:
-        """Helper to convert plain text URLs into HTML clickable links."""
-        # More robust URL regex pattern
+    def _format_body_to_html(self, text: str) -> str:
+        """Helper to convert plain text into formatted HTML (links + bold)."""
+        # Convert newlines to <br> first
+        html = text.replace('\n', '<br>')
+
+        # 1. Handle Markdown Bolding (**text**)
+        bold_pattern = r'\*\*(.*?)\*\*'
+        html = re.sub(bold_pattern, r'<b>\1</b>', html)
+
+        # 2. Handle URLs (More robust regex)
         url_pattern = r'((?:https?://|www\.|[a-zA-Z0-9][-a-zA-Z0-9]*\.)[a-zA-Z0-9][-a-zA-Z0-9.]*\.(?:com|in|org|net|io|me|edu|app|dev|sh|ai|gov|mil|edu|[a-z]{2})(?:/[^\s<>"]*)?)'
         
-        def replace_match(match):
+        def replace_url_match(match):
             url = match.group(0)
-            # Clean up trailing punctuation that might have been caught
             clean_url = url.rstrip('.,!?;:)')
             trailing_punct = url[len(clean_url):]
-            
-            href = clean_url
-            if not clean_url.startswith('http'):
-                href = 'https://' + clean_url
-            
+            href = clean_url if clean_url.startswith('http') else 'https://' + clean_url
             return f'<a href="{href}" style="color: #1a73e8; text-decoration: underline;">{clean_url}</a>{trailing_punct}'
         
-        # Convert newlines to <br>
-        html = text.replace('\n', '<br>')
-        # Replace URLs
-        html = re.sub(url_pattern, replace_match, html)
+        html = re.sub(url_pattern, replace_url_match, html)
         return html
 
     def send_email(self, to_address: str, subject: str, body: str, attachment_path: str = None) -> str:
@@ -72,7 +71,7 @@ class EmailAgent(BaseAgent):
             html_content = f"""
             <html>
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                    {self._make_links_clickable(body)}
+                    {self._format_body_to_html(body)}
                     <br><br>
                     <hr style="border: none; border-top: 1px solid #eee;">
                     <p style="font-size: 12px; color: #888;">Sent via 🪄 Narad AI Email Agent</p>
