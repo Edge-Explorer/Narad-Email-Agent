@@ -34,29 +34,38 @@ class EmailComposer:
             print(f"⚠️ Warning: Could not read CV content: {e}")
             return ""
 
-    def draft_email(self, description: str, tone: str = "formal") -> dict:
+    def draft_email(self, description: str, tone: str = "formal", job_description: str = "", recipient_info: str = "") -> dict:
         """
-        Drafts an email based on a natural language prompt and a specified tone.
-        :param description: What the email is about.
-        :param tone: "formal" or "informal".
+        Drafts a highly personalized email.
+        :param description: High-level goal (e.g., 'Apply for AI role').
+        :param tone: 'formal' or 'informal'.
+        :param job_description: (Optional) The JD text to align skills with.
+        :param recipient_info: (Optional) Name, role, or company details.
         """
         # Create a user context string.
         user_context = f"My name is {self.user_name}. Educational background: {self.user_university}, Major: {self.user_major}."
         if self.cv_content:
-            user_context += f"\n\nHere is the content of my CV/Resume for more details:\n{self.cv_content[:3000]}" # Limit to 3000 chars.
+            user_context += f"\n\nHere is the content of my CV/Resume for more details:\n{self.cv_content[:3000]}"
         
-        prompt = f"""
-        User Context:
-        {user_context}
-        
-        Draft a {tone} email based on this description: '{description}'
-        
-        If formal: use professional language, proper greetings, and clear structure.
-        If informal: use casual, friendly language and a relaxed tone.
-        
-        Auto-fill as much information as possible using the provided CV details (links, skills, projects).
-        If you don't have enough details, use appropriate placeholders.
+        target_context = ""
+        if recipient_info:
+            target_context += f"\nTarget Recipient Info: {recipient_info}"
+        if job_description:
+            target_context += f"\nJob Description/Requirement: {job_description}"
 
+        prompt = f"""
+        User Context (ME):
+        {user_context}
+        {target_context}
+
+        Draft a {tone} email based on this goal: '{description}'
+        
+        CRITICAL INSTRUCTIONS:
+        1. If Recipient Info is provided, address them directly (e.g., 'Dear Mr. Smith' instead of 'Dear Hiring Manager').
+        2. If a Job Description is provided, analyze it and specifically mention how my skills from the CV match their requirements. Focus on high-impact matching.
+        3. Eliminate generic placeholders like [Company Name] or [Hiring Manager] if you can infer them from the provided info.
+        4. Make the email feel human, tailored, and specifically written for this exact opportunity.
+        
         Provide the output in this EXACT format:
         SUBJECT: [Your Subject Line]
         BODY: [Your Email Body Content]

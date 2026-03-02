@@ -34,12 +34,16 @@ class NaradCLI:
 
     def handle_send(self, user_command: str):
         """Handles the 'send' flow (asking for details, drafting, confirming)."""
-        print("\n📝 Composition Mode: Speak naturally (e.g., 'Email my boss about the meeting results')")
-        prompt = input("Compose description: ").strip()
+        print("\n📝 Composition Mode: Speak naturally (e.g., 'Apply for the AI Developer role')")
+        goal = input("Main goal/subject: ").strip()
         
-        if not prompt:
-            print("❌ Error: No description provided.")
+        if not goal:
+            print("❌ Error: No goal provided.")
             return
+
+        print("\n🎯 (Optional) Personalization: Press Enter to skip any of these.")
+        recipient_info = input("Recipient Name/Company: ").strip()
+        job_description = input("Job Description (Paste JD here): ").strip()
 
         print("\nChoose Tone:")
         print("[1] Formal (Professional & structured)")
@@ -48,8 +52,8 @@ class NaradCLI:
 
         tone = "informal" if tone_choice == "2" else "formal"
 
-        print(f"\n✍️ Drafting {tone} email with Gemini...")
-        draft = self.composer.draft_email(prompt, tone=tone)
+        print(f"\n✍️ Drafting {tone} email using Gemini & your CV...")
+        draft = self.composer.draft_email(goal, tone=tone, job_description=job_description, recipient_info=recipient_info)
         
         print(f"\n--- AI Drafted Content ({tone.capitalize()}) ---")
         print(f"Subject: {draft['subject']}")
