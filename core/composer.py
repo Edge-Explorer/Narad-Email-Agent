@@ -10,6 +10,7 @@ class EmailComposer:
         self.user_name = os.getenv("USER_NAME", "[Your Name]")
         self.user_university = os.getenv("USER_UNIVERSITY", "[Your Education]")
         self.user_major = os.getenv("USER_MAJOR", "[Your Major]")
+        self.user_portfolio = os.getenv("USER_PORTFOLIO", "")
         
         # Load specific CV from 'resumes/' folder if provided, otherwise find latest.
         self.cv_content, self.current_cv = self._load_cv_content(cv_filename)
@@ -55,6 +56,9 @@ class EmailComposer:
         """
         # Create a user context string.
         user_context = f"My name is {self.user_name}. Educational background: {self.user_university}, Major: {self.user_major}."
+        if self.user_portfolio:
+            user_context += f" My portfolio website: {self.user_portfolio}"
+            
         if self.cv_content:
             user_context += f"\n\nHere is the content of my CV/Resume for more details:\n{self.cv_content[:3000]}"
         

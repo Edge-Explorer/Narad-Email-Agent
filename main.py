@@ -165,8 +165,32 @@ class NaradCLI:
         print(f"\n💡 Narad Tip: I recommend checking LinkedIn and Wellfound for '{query}' roles.")
         print("Once you find a JD, come back here and use 'send' to apply!")
 
+    def handle_followup(self):
+        """Finds pending applications and drafts follow-up emails."""
+        print("\n⏰ Checking for pending follow-ups...")
+        apps = self.db.get_pending_followups()
+        if not apps:
+            print("✨ No pending follow-ups found!")
+            return
+            
+        print("\nSelect an application to follow up on:")
+        for idx, a in enumerate(apps[:5], 1):
+            print(f"[{idx}] Company: {a[3]} | Sent: {a[6][:10]}")
+            
+        choice = input("Choice (default 1): ").strip()
+        selected = apps[int(choice)-1] if choice.isdigit() and int(choice) <= len(apps) else apps[0]
+        
+        print(f"\n✍️ Drafting follow-up for {selected[3]}...")
+        prompt = f"Draft a professional and polite follow-up email for a {selected[4]} role at {selected[3]}. I applied on {selected[6][:10]} and haven't heard back yet."
+        draft = self.composer.gemini.generate_content(prompt)
+        
+        print("\n--- AI Drafted Follow-up ---")
+        print(draft)
+        print("-" * 25)
+        print(f"Recipient: {selected[1]}")
+
     def run_loop(self):
-        """Main application lifecycle with all 6 advanced features."""
+        """Main application lifecycle with all 7 advanced features."""
         self.show_header()
         
         while True:
@@ -188,6 +212,8 @@ class NaradCLI:
                     self.handle_interview()
                 elif cmd == 'search':
                     self.handle_search()
+                elif cmd == 'followup':
+                    self.handle_followup()
                 elif cmd == 'help':
                     print("\n" + "=" * 60)
                     print("   📖  NARAD HELP MENU")
@@ -197,6 +223,7 @@ class NaradCLI:
                     print("- summarize : AI summaries of your inbox.")
                     print("- stats     : View your Job Application CRM history.")
                     print("- search    : Help find new job opportunities.")
+                    print("- followup  : Draft smart follow-ups for pending applications.")
                     print("- interview : Get AI prep for your most recent application.")
                     print("- exit      : Close Narad.")
                     print("=" * 60)
