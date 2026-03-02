@@ -43,13 +43,19 @@ class NaradCLI:
 
         print("\n🎯 (Optional) Personalization: Press Enter to skip any of these.")
         recipient_info = input("Recipient Name/Company: ").strip()
-        print("Job Description (Paste JD here, then type 'DONE' on a new line):")
+        print("\n📥 [PASTE MODE] Paste your Job Description below.")
+        print("💡 When finished, type 'DONE' and press Enter.")
         jd_lines = []
-        while True:
-            line = input()
-            if line.strip().upper() == "DONE":
-                break
-            jd_lines.append(line)
+        line_count = 1
+        try:
+            while True:
+                line = input(f"L{line_count}> ")
+                if line.strip().upper() == "DONE":
+                    break
+                jd_lines.append(line)
+                line_count += 1
+        except EOFError:
+            print("\n⚠️ End of input detected.")
         job_description = "\n".join(jd_lines).strip()
 
         print("\nChoose Tone:")
@@ -144,7 +150,7 @@ class NaradCLI:
                     continue
                 else:
                     print(f"❓ Unknown command: {cmd}")
-            except KeyboardInterrupt:
+            except (KeyboardInterrupt, EOFError):
                 print("\n👋 Goodbye!")
                 break
             except Exception as e:
