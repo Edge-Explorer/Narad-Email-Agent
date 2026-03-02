@@ -26,6 +26,12 @@ class NaradCLI:
         print("Commands: 'send', 'check', 'summarize', 'help', 'exit'")
         print("-" * 60)
 
+    def _get_resume_path(self):
+        """Finds any PDF in the root that looks like a resume."""
+        files = os.listdir(".")
+        pdf_files = [f for f in files if f.lower().endswith(".pdf") and ("resume" in f.lower() or "cv" in f.lower() or "karan" in f.lower())]
+        return pdf_files[0] if pdf_files else None
+
     def handle_send(self, user_command: str):
         """Handles the 'send' flow (asking for details, drafting, confirming)."""
         print("\n📝 Composition Mode: Speak naturally (e.g., 'Email my boss about the meeting results')")
@@ -50,6 +56,12 @@ class NaradCLI:
         print(f"Body:\n{draft['body']}")
         print("-" * 25)
         
+        # Attachment check
+        resume_path = self._get_resume_path()
+        attach_cv = 'n'
+        if resume_path:
+            attach_cv = input(f"📎 Found resume ({resume_path}). Attach it? (y/n): ").strip().lower()
+
         recipient = input("Recipient email: ").strip()
         if not recipient:
             print("❌ Error: No recipient provided.")
@@ -58,7 +70,8 @@ class NaradCLI:
         confirm = input(f"Send to {recipient}? (y/n): ").strip().lower()
         if confirm == 'y':
             print("🚀 Sending...")
-            result = self.agent.send_email(recipient, draft['subject'], draft['body'])
+            final_attach = resume_path if attach_cv == 'y' else None
+            result = self.agent.send_email(recipient, draft['subject'], draft['body'], attachment_path=final_attach)
             print(result)
         else:
             print("🚫 Message discarded.")

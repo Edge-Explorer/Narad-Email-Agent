@@ -4,6 +4,8 @@ import imaplib
 import email
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 from agents.base_agent import BaseAgent
 from dotenv import load_dotenv
 
@@ -26,8 +28,8 @@ class EmailAgent(BaseAgent):
         self.smtp_port = int(os.getenv("SMTP_PORT", 587))
         self.imap_server = os.getenv("IMAP_SERVER", "imap.gmail.com")
 
-    def send_email(self, to_address: str, subject: str, body: str) -> str:
-        """Sends an email using SMTP."""
+    def send_email(self, to_address: str, subject: str, body: str, attachment_path: str = None) -> str:
+        """Sends an email using SMTP, with optional attachment."""
         try:
             # Prepare the email headers and body.
             msg = MIMEMultipart()
@@ -36,6 +38,19 @@ class EmailAgent(BaseAgent):
             msg["Subject"] = subject
             msg.attach(MIMEText(body, "plain"))
             
+            # Add attachment if provided.
+            if attachment_path and os.path.exists(attachment_path):
+                try:
+                    filename = os.path.basename(attachment_path)
+                    with open(attachment_path, "rb") as attachment:
+                        part = MIMEBase("application", "octet-stream")
+                        part.set_payload(attachment.read())
+                    encoders.encode_base64(part)
+                    part.add_header("Content-Disposition", f"attachment; filename= {filename}")
+                    msg.attach(part)
+                except Exception as attach_err:
+                    print(f"⚠️ Warning: Could not attach file: {attach_err}")
+
             # Use smtplib to connect to the server and send the message.
             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
                 server.starttls()  # Upgrade connection to secure TLS.
