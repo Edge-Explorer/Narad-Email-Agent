@@ -1,24 +1,29 @@
-# 🪄 Narad Email Agent
+# 🪄 Narad — Your AI-Powered Job Search Engine
 
-> **An AI-powered CLI Email Assistant — built to send hyper-personalized, professional emails with zero effort.**
+> **Not just an email tool. A full AI-powered career management system that drafts, tracks, and manages your entire job search pipeline — all from your terminal.**
 
-Narad is a command-line email agent powered by **Google Gemini 2.0 Flash**. It reads your CV, matches your skills to a Job Description, and drafts a perfectly tailored email — all from your terminal.
+Narad is a command-line career agent powered by **Google Gemini 2.0 Flash**. It reads your CV, matches your skills to a Job Description, drafts a hyper-personalized email, tracks every application in a local CRM, and even preps you for interviews — all in one place.
 
 ---
 
 ## ✨ Features
 
-| Feature | Description |
-|---|---|
-| 🧠 **AI Drafting** | Gemini 2.0 Flash drafts emails based on your natural language description. |
-| 🎭 **Formal & Informal Tone** | Choose between a professional or casual email tone. |
-| 📄 **CV-Aware Personalization** | Narad reads your resume PDF and uses your real skills, links & projects. |
-| 🎯 **JD Matching** | Paste a Job Description and Narad will tailor the email to match it precisely. |
-| 📎 **Auto Attachment** | Automatically detects your resume PDF and offers to attach it. |
-| 🔗 **Clickable Links** | LinkedIn, GitHub, and Portfolio links are rendered as clickable HTML hyperlinks. |
-| 📬 **Check Inbox** | Fetch and display your latest 5 emails with sender, subject, and date. |
-| 🧾 **AI Summarizer** | Get AI-generated summaries of your newest emails in seconds. |
-| 🔐 **Secure by Design** | Uses Gmail App Passwords — your main password is never stored or used. |
+| Feature | Command | Description |
+|---|---|---|
+| 🧠 **AI Email Drafting** | `send` | Gemini 2.0 Flash drafts tailored job emails. |
+| 🎭 **Multi-CV Profiles** | `send` | Switch between different resume versions before each application. |
+| 📄 **CV-Aware** | `send` | Narad reads your PDF resume and uses your real skills and links. |
+| 🎯 **JD Matching** | `send` | Paste a Job Description — Narad matches your skills to it precisely. |
+| 📎 **Auto Attachment** | `send` | Automatically attaches your selected resume PDF to the email. |
+| 🔗 **Clickable Links** | `send` | LinkedIn, GitHub, and Portfolio are rendered as clickable HTML hyperlinks. |
+| **Bold Formatting** | `send` | AI bold text (`**like this**`) is automatically converted to real HTML bold. |
+| 📊 **Job Application CRM** | `stats` | Tracks every email you send (company, title, date, status) in a local database. |
+| ⏰ **Smart Follow-ups** | `followup` | Identifies pending applications and drafts polite follow-up emails. |
+| 🧠 **Interview Prep** | `interview` | Generates custom technical & behavioral questions based on your JD + CV. |
+| 🔍 **Job Search Helper** | `search` | Helps you identify and target the right roles. |
+| 📬 **Check Inbox** | `check` | Fetch and display your latest 5 emails. |
+| 🧾 **AI Summarizer** | `summarize` | Get AI-generated summaries of your newest emails. |
+| 🔐 **Secure by Design** | — | Uses Gmail App Passwords. Your credentials never leave your machine. |
 
 ---
 
@@ -27,6 +32,7 @@ Narad is a command-line email agent powered by **Google Gemini 2.0 Flash**. It r
 - **AI Model**: Google Gemini 2.0 Flash (`google-generativeai`)
 - **Email**: Gmail SMTP (Sending) + Gmail IMAP (Reading)
 - **PDF Reading**: `pypdf`
+- **Local CRM Database**: `SQLite` (built-in Python, no server needed)
 - **Environment**: `python-dotenv`
 - **Language**: Python 3.x
 
@@ -54,7 +60,6 @@ cp .env.example .env
 ```
 
 Open `.env` and update:
-
 ```env
 # ── Gmail Credentials ─────────────────────────────
 EMAIL_ADDRESS="your_email@gmail.com"
@@ -71,14 +76,15 @@ USER_NAME="Your Full Name"
 USER_UNIVERSITY="Your University"
 USER_YEAR="Final Year"
 USER_MAJOR="Your Major"
+USER_PORTFOLIO="https://yourportfolio.vercel.app/"
 ```
 
 > 💡 **Gmail App Password**: Go to [Google Account → Security → App Passwords](https://myaccount.google.com/security) and generate a 16-digit password.
-> 
+>
 > 💡 **Gemini API Key**: Get a free key from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
-### 3️⃣ Add Your Resume
-Drop your **CV/Resume PDF** into the root folder of the project. Narad will auto-detect it.
+### 3️⃣ Add Your Resume(s)
+Drop your **CV/Resume PDF(s)** into the `resumes/` folder. Narad will auto-detect all of them. You can have multiple CVs for different roles!
 
 ---
 
@@ -88,38 +94,75 @@ Drop your **CV/Resume PDF** into the root folder of the project. Narad will auto
 python main.py
 ```
 
-You'll see the main menu:
+You'll see the Narad command center:
 ```
 ============================================================
-   🪄  NARAD EMAIL AGENT | Powered by Gemini 2.0 Flash
+   🪄  NARAD | Your AI-Powered Job Search Engine
 ============================================================
-Commands: 'send', 'check', 'summarize', 'help', 'exit'
+Commands: 'send', 'check', 'summarize', 'stats', 'search', 'followup', 'interview', 'help', 'exit'
 ------------------------------------------------------------
 ```
 
-### 📤 Sending a Job Application Email
-1. Type **`send`**
-2. Enter your goal: `Apply for Generative AI Developer role`
-3. (Optional) Enter **Recipient Name/Company**: `Mr. Sharma at Idolize Business Solutions`
-4. (Optional) **Paste a Job Description**:
-   - Narad enters **[PASTE MODE]** with line numbers (`L1>`, `L2>`...)
-   - Paste your entire JD, then type **`DONE`** on a new line and press Enter
-5. Choose **`1`** for Formal or **`2`** for Informal tone
+---
+
+### 📤 `send` — AI Job Application
+
+1. Choose your **Career Profile** (which CV to use)
+2. Describe your goal: `"Apply for Generative AI Developer at TCS"`
+3. Enter **Recipient Name/Company** (optional but recommended)
+4. Enter **Target Job Title** (e.g., `Generative AI Dev`)
+5. **Paste the Job Description** — enter `DONE` when complete
 6. Review the AI-drafted email
-7. When prompted, type **`y`** to attach your resume
-8. Enter the **recipient's email address** and confirm to send ✅
+7. Confirm to send (your CV is auto-attached!) ✅
 
-### 📬 Checking Your Inbox
-Type **`check`** — Narad fetches and displays your latest 5 emails:
+---
+
+### 📊 `stats` — Application CRM
+
+Every application you send is automatically logged. This command shows a summary:
 ```
-[1] ✉️ FROM: hr@company.com | SUBJECT: Interview Scheduled | DATE: Mon, 02 Mar 2026
+Total Applications: 5
+ID: 1 | Company: TCS | Status: Sent | Date: 2026-03-02
+ID: 2 | Company: Idolize | Status: Sent | Date: 2026-03-02
 ```
 
-### 🧾 Summarizing Emails
-Type **`summarize`** — Gemini AI reads your inbox and generates concise summaries.
+---
 
-### ❓ Help Menu
-Type **`help`** — Shows all commands with detailed descriptions.
+### ⏰ `followup` — Smart Follow-up
+
+Didn't hear back in 4 days? Narad will:
+1. Check your CRM for pending applications.
+2. Let you pick which one to follow up on.
+3. Draft a polite, professional "Just checking in" email.
+
+---
+
+### 🧠 `interview` — Interview Prep
+
+After sending your application, type `interview`:
+1. Narad fetches the JD you applied to from the CRM.
+2. It cross-references your CV skills against the JD.
+3. Gemini generates:
+   - **Top 5 Technical Questions**
+   - **Top 3 Behavioral Questions**
+   - **Your "Perfect Pitch"** (a personalized intro for this specific role)
+
+---
+
+### 📬 `check` — Inbox View
+
+Fetches and displays your latest 5 emails:
+```
+[1] ✉️ FROM: hr@tcs.com | SUBJECT: Interview Invite | DATE: Mon, 02 Mar 2026
+```
+
+### 🧾 `summarize` — AI Email Summaries
+
+Gemini reads your inbox and generates concise summaries for each email.
+
+### 🔍 `search` — Job Hunt Mode
+
+Helps you strategize your job search for a specific role.
 
 ---
 
@@ -128,20 +171,24 @@ Type **`help`** — Shows all commands with detailed descriptions.
 ```
 Narad-Email-Agent/
 ├── agents/
-│   ├── base_agent.py       # Base class for all agents
-│   └── email_agent.py      # SMTP + IMAP email logic, HTML formatting
+│   ├── base_agent.py         # Base class for all agents
+│   └── email_agent.py        # SMTP + IMAP logic + HTML formatting + bold rendering
 ├── core/
-│   ├── gemini_client.py    # Gemini 2.0 Flash API wrapper
-│   ├── composer.py         # AI email drafting (CV + JD + Profile aware)
-│   ├── summarizer.py       # AI email summarization
-│   └── reader.py           # Inbox fetching and formatting
+│   ├── gemini_client.py      # Gemini 2.0 Flash API wrapper
+│   ├── composer.py           # AI drafting engine (CV + JD + Portfolio aware)
+│   ├── database.py           # SQLite CRM for tracking applications
+│   ├── summarizer.py         # AI inbox summarization
+│   └── reader.py             # Inbox fetching and formatting
+├── resumes/                  # Drop your resume PDFs here (Multi-CV support!)
+│   └── YourResume.pdf
 ├── utils/
-│   └── helpers.py          # Shared utility functions
-├── main.py                 # CLI entry point
-├── requirements.txt        # Python dependencies
-├── .env.example            # Safe credential template
-├── .gitignore              # Keeps credentials out of GitHub
-└── README.md               # This file
+│   └── helpers.py            # Shared utility functions
+├── main.py                   # CLI entry point with all 7 commands
+├── narad_crm.db              # Auto-created local CRM database (gitignored)
+├── requirements.txt          # Python dependencies
+├── .env.example              # Safe credentials template
+├── .gitignore                # Keeps credentials and DB out of GitHub
+└── README.md                 # This file
 ```
 
 ---
@@ -149,6 +196,7 @@ Narad-Email-Agent/
 ## 🔐 Security
 
 - **`.env` is in `.gitignore`** — your credentials are **never pushed to GitHub**.
+- **`narad_crm.db` is in `.gitignore`** — your job search data stays private.
 - Uses **Gmail App Passwords**, not your main Google password.
 - Your API key and email data stay **local to your machine**.
 
@@ -156,11 +204,15 @@ Narad-Email-Agent/
 
 ## 🚀 What Makes Narad Unique
 
-Unlike generic email tools, Narad actually **understands who you are**:
-1.  It reads your **entire CV/Resume PDF** on startup.
-2.  It reads the **JD you provide** and identifies key requirements.
-3.  Gemini 2.0 Flash **cross-references** your CV skills against the JD.
-4.  The output is a **hyper-personalized email** that sounds like *you* wrote it.
+Unlike generic email tools, Narad is a **full recruitment pipeline agent**:
+
+1. It reads your **entire CV/Resume PDF** and your **Portfolio URL** on startup.
+2. It reads the **JD you provide** and identifies key requirements.
+3. Gemini **cross-references** your skills against the JD automatically.
+4. The email is **100% unique** — tailored to that exact company and role.
+5. The application is **logged** in your local CRM immediately.
+6. After 4 days, **Narad follows up** so no opportunity slips through the cracks.
+7. If you get an interview, Narad **prepares you** based on the same JD it applied to.
 
 ---
 
@@ -170,7 +222,8 @@ Unlike generic email tools, Narad actually **understands who you are**:
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/karan-shelar-779381343)
 [![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/karanshelar8775)
+[![Portfolio](https://img.shields.io/badge/Portfolio-FF5722?style=for-the-badge&logo=vercel&logoColor=white)](https://karan-portfolio-opal.vercel.app/)
 
 ---
 
-*Built with ❤️ and Gemini 2.0 Flash*
+*Built with ❤️ and Gemini 2.0 Flash — Because applying to jobs manually is so 2023.*
