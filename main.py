@@ -43,7 +43,14 @@ class NaradCLI:
 
         print("\n🎯 (Optional) Personalization: Press Enter to skip any of these.")
         recipient_info = input("Recipient Name/Company: ").strip()
-        job_description = input("Job Description (Paste JD here): ").strip()
+        print("Job Description (Paste JD here, then type 'DONE' on a new line):")
+        jd_lines = []
+        while True:
+            line = input()
+            if line.strip().upper() == "DONE":
+                break
+            jd_lines.append(line)
+        job_description = "\n".join(jd_lines).strip()
 
         print("\nChoose Tone:")
         print("[1] Formal (Professional & structured)")
