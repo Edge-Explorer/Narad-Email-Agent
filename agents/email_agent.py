@@ -2,6 +2,7 @@ import os
 import smtplib
 import imaplib
 import email
+import re
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -28,15 +29,47 @@ class EmailAgent(BaseAgent):
         self.smtp_port = int(os.getenv("SMTP_PORT", 587))
         self.imap_server = os.getenv("IMAP_SERVER", "imap.gmail.com")
 
+    def _make_links_clickable(self, text: str) -> str:
+        """Helper to convert plain text URLs into HTML clickable links."""
+        url_pattern = r'(https?://[^\s<>"]+|www\.[^\s<>"]+|[a-zA-Z0-9.-]+\.(com|in|org|net|io|me|edu)[^\s<>"]*)'
+        def replace_match(match):
+            url = match.group(0)
+            href = url if url.startswith('http') else 'https://' + url
+            return f'<a href="{href}" style="color: #1a73e8; text-decoration: none;">{url}</a>'
+        
+        # Convert newlines to <br> and replace URLs
+        html = text.replace('\n', '<br>')
+        html = re.sub(url_pattern, replace_match, html)
+        return html
+
     def send_email(self, to_address: str, subject: str, body: str, attachment_path: str = None) -> str:
-        """Sends an email using SMTP, with optional attachment."""
+        """Sends an email using SMTP with HTML formatting and optional attachment."""
         try:
-            # Prepare the email headers and body.
-            msg = MIMEMultipart()
-            msg["From"] = self.user_email
+            # Create a complex multi-part message (alternative for text/html, related for attachments)
+            msg = MIMEMultipart("mixed")
+            msg["From"] = f"Narad AI <{self.user_email}>"
             msg["To"] = to_address
             msg["Subject"] = subject
-            msg.attach(MIMEText(body, "plain"))
+            
+            # Create the alternative (body) part for plain text and HTML.
+            alt_part = MIMEMultipart("alternative")
+            msg.attach(alt_part)
+            
+            # Add plain text version.
+            alt_part.attach(MIMEText(body, "plain"))
+            
+            # Create and add HTML version with clickable links.
+            html_content = f"""
+            <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    {self._make_links_clickable(body)}
+                    <br><br>
+                    <hr style="border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #888;">Sent via 🪄 Narad AI Email Agent</p>
+                </body>
+            </html>
+            """
+            alt_part.attach(MIMEText(html_content, "html"))
             
             # Add attachment if provided.
             if attachment_path and os.path.exists(attachment_path):
@@ -57,7 +90,7 @@ class EmailAgent(BaseAgent):
                 server.login(self.user_email, self.password)
                 server.sendmail(self.user_email, to_address, msg.as_string())
                 
-            return f"✅ Email successfully sent to {to_address}!"
+            return f"✅ Formatted Email (with clickable links) sent to {to_address}!"
         except Exception as e:
             return f"❌ Error sending email: {e}"
 
