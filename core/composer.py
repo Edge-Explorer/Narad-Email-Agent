@@ -4,35 +4,46 @@ from core.gemini_client import GeminiClient
 
 class EmailComposer:
     """Uses Gemini to draft professional emails."""
-    def __init__(self):
+    def __init__(self, cv_filename: str = None):
         self.gemini = GeminiClient()
         # Load user profile from environment variables.
         self.user_name = os.getenv("USER_NAME", "[Your Name]")
-        self.user_university = os.getenv("USER_UNIVERSITY", "[Your Year] Student at [Your University]")
+        self.user_university = os.getenv("USER_UNIVERSITY", "[Your Education]")
         self.user_major = os.getenv("USER_MAJOR", "[Your Major]")
         
-        # Load CV content if available.
-        self.cv_content = self._load_cv_content()
+        # Load specific CV from 'resumes/' folder if provided, otherwise find latest.
+        self.cv_content, self.current_cv = self._load_cv_content(cv_filename)
 
-    def _load_cv_content(self) -> str:
-        """Finds and reads the text from the CV/Resume PDF in the root directory."""
+    def _load_cv_content(self, target_filename: str = None) -> tuple:
+        """Finds and reads the text from a specific CV in the 'resumes/' directory."""
         try:
-            # Look for any PDF file that might be a resume in the root.
-            root_files = os.listdir(".")
-            pdf_files = [f for f in root_files if f.lower().endswith(".pdf") and ("resume" in f.lower() or "cv" in f.lower() or "karan" in f.lower())]
+            resumes_dir = "resumes"
+            if not os.path.exists(resumes_dir):
+                os.makedirs(resumes_dir)
+            
+            root_files = os.listdir(resumes_dir)
+            pdf_files = [f for f in root_files if f.lower().endswith(".pdf")]
             
             if not pdf_files:
-                return ""
+                return "", "No Resume Found"
             
-            cv_path = pdf_files[0] # Use the first match.
+            # If a specific filename is requested, use it, otherwise use the first match.
+            cv_filename = target_filename if target_filename in pdf_files else pdf_files[0]
+            cv_path = os.path.join(resumes_dir, cv_filename)
+            
             reader = pypdf.PdfReader(cv_path)
             text = ""
             for page in reader.pages:
                 text += page.extract_text() + "\n"
-            return text.strip()
+            return text.strip(), cv_filename
         except Exception as e:
             print(f"⚠️ Warning: Could not read CV content: {e}")
-            return ""
+            return "", "Error Reading CV"
+
+    def list_profiles(self) -> list:
+        """Lists all available CV files in the resumes/ folder."""
+        if not os.path.exists("resumes"): return []
+        return [f for f in os.listdir("resumes") if f.lower().endswith(".pdf")]
 
     def draft_email(self, description: str, tone: str = "formal", job_description: str = "", recipient_info: str = "") -> dict:
         """
