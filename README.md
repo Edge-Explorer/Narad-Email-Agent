@@ -1,46 +1,65 @@
-# Narad Email Agent 📧🤖
+# 🪄 Narad Email Agent
 
-The **Narad Email Agent** is a modular backend component designed to interface with email services. It allows users to send, receive, and manage emails using natural language commands. This agent is part of the Narad AI assistant ecosystem, providing seamless integration with email functionalities.
-
----
-
-## ⚙️ Features
-
-* **Email Sending**: Compose and send emails using natural language inputs.
-* **Inbox Management**: Retrieve and organize incoming emails.
-* **Natural Language Processing**: Interpret and respond to user queries in natural language, converting them into appropriate email actions.
-* **Modular Design**: Easily extendable to support additional email features or integrate with other services.
+An AI-powered Email Assistant built with Python and **Gemini 2.0 Flash**. Narad helps you manage your inbox and draft emails using natural language—all through a clean CLI.
 
 ---
 
-## 🧠 Tech Stack
+## 🚀 Key Features
 
-* **Backend**: Python (Flask)
-* **Natural Language Processing**: OpenAI GPT models
-* **Email Integration**: IMAP, SMTP protocols
-* **Authentication**: OAuth 2.0
-
----
-
-## 📁 Modules
-
-* `email_agent.py`: Core agent handling email interactions.
-* `nlp_processor.py`: Processes and interprets natural language queries.
-* `auth.py`: Handles authentication and authorization with email services.
-* `config.py`: Configuration settings for the agent.
+- **🧠 AI Email Drafting**: Speak naturally (e.g., *"Email my boss about the meeting"*) and let Gemini write the subject and body.
+- **🌗 Tone Control**: Choose between **Formal** (Professional/Structured) and **Informal** (Friendly/Casual) for every draft.
+- **📬 Inbox Reader**: Quickly list your latest emails directly from your terminal using IMAP.
+- **📚 AI Summarizer**: Get a bulleted summary of your recent emails to save time.
+- **⚡ Fast & Secure**: Powered by the ultra-fast Gemini 2.0 Flash API and supports Gmail App Passwords.
 
 ---
 
-## 🧪 Input
+## 🛠️ Setup & Installation
 
-* **User Queries**: Natural language inputs from users, such as "Send an email to John about the meeting" or "Show me my unread emails".
-* **Email Events**: Incoming messages or notifications from the email service.([Stack Overflow][1])
+### 1️⃣ Clone the Repository
+```bash
+git clone https://github.com/karanshelar8775/Narad-Email-Agent.git
+cd Narad-Email-Agent
+```
+
+### 2️⃣ Create Virtual Environment & Install Dependencies
+```bash
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### 3️⃣ Configure Environment Variables
+Copy `.env.example` to `.env` and fill in your details:
+- **`EMAIL_ADDRESS`**: Your Gmail address.
+- **`EMAIL_PASSWORD`**: Your [Gmail App Password](https://myaccount.google.com/security) (16 digits).
+- **`GEMINI_API_KEY`**: Your key from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 ---
 
-## 🚀 Goal
+## 🎮 How to Use
 
-To provide an intelligent and conversational interface for managing emails, enabling users to handle their email tasks more efficiently through natural language commands.
+Run the agent:
+```bash
+python main.py
+```
 
+### 📖 Available Commands
+- **`send`**: Draft and send an email using AI (pick Formal/Informal tone).
+- **`check`**: List your latest 5 emails (Sender, Subject, Date).
+- **`summarize`**: Get AI-generated summaries of your inbox.
+- **`help`**: Show the detailed help menu.
+- **`exit`**: Close the agent.
 
+---
 
+## 🔐 Security & Privacy
+- **`.gitignore`** is configured to protect your `.env` and `venv` from being pushed to GitHub.
+- **App Passwords** ensure your main Google password remains safe.
+
+---
+
+## 🛠️ Built With
+- **Python** (SMTP/IMAP)
+- **Gemini 2.0 Flash API**
+- **dotenv** (Secure config)
