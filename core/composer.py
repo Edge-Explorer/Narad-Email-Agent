@@ -1,3 +1,4 @@
+import os
 from core.gemini_client import GeminiClient
 
 class EmailComposer:
