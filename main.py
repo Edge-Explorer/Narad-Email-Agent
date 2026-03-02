@@ -35,10 +35,17 @@ class NaradCLI:
             print("❌ Error: No description provided.")
             return
 
-        print("✍️ Drafting email with Gemini...")
-        draft = self.composer.draft_email(prompt)
+        print("\nChoose Tone:")
+        print("[1] Formal (Professional & structured)")
+        print("[2] Informal (Friendly & casual)")
+        tone_choice = input("Choice (1 or 2, default 1): ").strip()
+
+        tone = "informal" if tone_choice == "2" else "formal"
+
+        print(f"\n✍️ Drafting {tone} email with Gemini...")
+        draft = self.composer.draft_email(prompt, tone=tone)
         
-        print(f"\n--- AI Drafted Content ---")
+        print(f"\n--- AI Drafted Content ({tone.capitalize()}) ---")
         print(f"Subject: {draft['subject']}")
         print(f"Body:\n{draft['body']}")
         print("-" * 25)
@@ -100,7 +107,15 @@ class NaradCLI:
                 elif cmd == 'summarize':
                     self.handle_summarize()
                 elif cmd == 'help':
-                    print("Available: send, check, summarize, exit")
+                    print("\n" + "=" * 60)
+                    print("   📖  NARAD HELP MENU")
+                    print("=" * 60)
+                    print("- send      : Draft and send an email using AI (Formal/Informal).")
+                    print("- check     : List your latest 5 emails (Sender, Subject, Date).")
+                    print("- summarize : AI-generated summaries of your recent emails.")
+                    print("- help      : Show this help menu.")
+                    print("- exit      : Close the Narad Email Agent.")
+                    print("=" * 60)
                 elif not cmd:
                     continue
                 else:

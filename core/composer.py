@@ -5,14 +5,18 @@ class EmailComposer:
     def __init__(self):
         self.gemini = GeminiClient()
 
-    def draft_email(self, description: str) -> dict:
+    def draft_email(self, description: str, tone: str = "formal") -> dict:
         """
-        Drafts an email based on a simple natural language prompt.
-        Prompt: 'Email my professor about the deadline'
+        Drafts an email based on a natural language prompt and a specified tone.
+        :param description: What the email is about.
+        :param tone: "formal" or "informal".
         """
         prompt = f"""
-        Draft a professional and concise email based on this description: '{description}'
+        Draft a {tone} email based on this description: '{description}'
         
+        If formal: use professional language, proper greetings, and clear structure.
+        If informal: use casual, friendly language and a relaxed tone.
+
         Provide the output in this EXACT format:
         SUBJECT: [Your Subject Line]
         BODY: [Your Email Body Content]
@@ -32,11 +36,11 @@ class EmailComposer:
                 pass
         
         # Fallback if the model doesn't follow instructions perfectly.
-        return {"subject": "Narad Email Draft", "body": response}
+        return {"subject": f"Narad {tone.capitalize()} Email", "body": response}
 
 if __name__ == "__main__":
     # Test Drafting logic.
     composer = EmailComposer()
-    draft = composer.draft_email("Follow up with my manager about the project deadline")
-    print(f"Drafted Subject: {draft['subject']}")
+    draft = composer.draft_email("Follow up with my manager about the project deadline", tone="formal")
+    print(f"Drafted (Formal) Subject: {draft['subject']}")
     print(f"Drafted Body:\n{draft['body']}")
