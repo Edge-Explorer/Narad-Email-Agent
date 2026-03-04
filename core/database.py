@@ -5,11 +5,15 @@ from datetime import datetime
 class NaradDatabase:
     """Manages the local CRM database for job applications."""
     def __init__(self, db_name="narad_crm.db"):
-        self.db_path = db_name
+        self.db_path = os.path.abspath(db_name)
         self._init_db()
 
     def _init_db(self):
         """Initializes the database schema."""
+        db_dir = os.path.dirname(self.db_path)
+        if db_dir and not os.path.exists(db_dir):
+            os.makedirs(db_dir, exist_ok=True)
+            
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             # Applications Table

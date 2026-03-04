@@ -3,8 +3,10 @@ import sys
 from fastmcp import FastMCP
 from dotenv import load_dotenv
 
-# Ensure we can import from our internal directories.
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# Ensure we can import from our internal directories and find local files (.env, .db).
+base_path = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(base_path)
+os.chdir(base_path)
 
 from agents.email_agent import EmailAgent
 from core.composer import EmailComposer
