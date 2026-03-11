@@ -7,6 +7,7 @@
 # ── 🔐 CREDENTIALS & SECRETS (NEVER PUSH THESE) ─
 .env
 .env.*
+*.env
 !.env.example
 
 
@@ -72,9 +73,24 @@ ehthumbs.db
 Desktop.ini
 
 
-# ── 📁 Project Specific ───────────────────────────
+# 📁 Project Specific ───────────────────────────
 # Local database or cache used by the agent
 *.db
 *.sqlite
 *.sqlite3
 data/cache/
+
+# 🔐 DevGuardian Security ───────────────────────
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+secrets/
+credentials/
+.aws/
+service-account*.json
+*_rsa
+*_dsa
+*_ecdsa
+*_ed25519
